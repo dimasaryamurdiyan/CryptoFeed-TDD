@@ -1,3 +1,5 @@
+package com.singaludra.cryptoapp.domain
+
 import kotlinx.coroutines.flow.Flow
 import java.lang.Exception
 
