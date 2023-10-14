@@ -8,6 +8,6 @@ sealed class CryptoFeedResult{
     data class Error(val exception: Exception): CryptoFeedResult()
 }
 
-interface CryptoFeedUseCase {
+interface LoadCryptoFeedUseCase {
     fun load(): Flow<CryptoFeedResult>
 }
