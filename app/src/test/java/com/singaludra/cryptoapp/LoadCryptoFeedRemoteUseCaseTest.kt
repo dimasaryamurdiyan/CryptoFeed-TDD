@@ -29,6 +29,19 @@ class LoadCryptoFeedRemoteUseCaseTest {
         assertEquals(1, client.getCount)
     }
 
+    @Test
+    fun testLoadTwiceRequestDataTwice(){
+        //Given
+        val (sut, client) = makeSut()
+
+        //When
+        sut.load()
+        sut.load()
+
+        //Then
+        assertEquals(2, client.getCount)
+    }
+
     private fun makeSut(): Pair<LoadCryptoFeedRemoteUseCase, HttpClientSpy> {
         val client = HttpClientSpy()
         val sut = LoadCryptoFeedRemoteUseCase(httpClient = client)
