@@ -4,22 +4,20 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class LoadCryptoFeedRemoteUseCase {
+class LoadCryptoFeedRemoteUseCase constructor(
+    private val httpClient: HttpClient
+) {
     fun load(){
-        HttpClient.instance.get()
+        httpClient.get()
     }
 }
 
-open class HttpClient {
-    companion object {
-        var instance = HttpClient()
-    }
-
-    open fun get(){}
+interface HttpClient {
+    fun get()
 
 }
 
-class HttpClientSpy: HttpClient() {
+class HttpClientSpy: HttpClient {
     var getCount = 0
 
     override fun get() {
@@ -31,8 +29,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
     @Test
     fun testInitDoesNotLoad(){
         val client = HttpClientSpy()
-        HttpClient.instance = client
-        LoadCryptoFeedRemoteUseCase()
+        LoadCryptoFeedRemoteUseCase(httpClient = client)
 
         assertTrue(client.getCount == 0)
         
@@ -42,8 +39,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
     fun testLoadRequestData(){
         //Given
         val client = HttpClientSpy()
-        HttpClient.instance = client
-        val sut = LoadCryptoFeedRemoteUseCase()
+        val sut = LoadCryptoFeedRemoteUseCase(httpClient = client)
 
         //When
         sut.load()
