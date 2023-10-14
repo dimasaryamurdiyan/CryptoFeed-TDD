@@ -9,7 +9,7 @@ import org.junit.Test
 
 class LoadCryptoFeedRemoteUseCaseTest {
     @Test
-    fun testInitDoesNotLoad(){
+    fun testInitDoesNotRequestData(){
         val (_, client) = makeSut()
         LoadCryptoFeedRemoteUseCase(httpClient = client)
 
