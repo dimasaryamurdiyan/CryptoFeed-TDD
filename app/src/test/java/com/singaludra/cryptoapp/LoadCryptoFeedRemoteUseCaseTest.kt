@@ -1,21 +1,11 @@
 package com.singaludra.cryptoapp
 
+import com.singaludra.cryptoapp.api.HttpClient
+import com.singaludra.cryptoapp.api.LoadCryptoFeedRemoteUseCase
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class LoadCryptoFeedRemoteUseCase constructor(
-    private val httpClient: HttpClient
-) {
-    fun load(){
-        httpClient.get()
-    }
-}
-
-interface HttpClient {
-    fun get()
-
-}
 
 class LoadCryptoFeedRemoteUseCaseTest {
     @Test
