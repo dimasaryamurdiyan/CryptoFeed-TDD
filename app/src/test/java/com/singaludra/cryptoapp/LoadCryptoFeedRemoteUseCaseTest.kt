@@ -17,18 +17,10 @@ interface HttpClient {
 
 }
 
-class HttpClientSpy: HttpClient {
-    var getCount = 0
-
-    override fun get() {
-        getCount += 1
-    }
-}
-
 class LoadCryptoFeedRemoteUseCaseTest {
     @Test
     fun testInitDoesNotLoad(){
-        val client = HttpClientSpy()
+        val (_, client) = makeSut()
         LoadCryptoFeedRemoteUseCase(httpClient = client)
 
         assertTrue(client.getCount == 0)
@@ -38,13 +30,27 @@ class LoadCryptoFeedRemoteUseCaseTest {
     @Test
     fun testLoadRequestData(){
         //Given
-        val client = HttpClientSpy()
-        val sut = LoadCryptoFeedRemoteUseCase(httpClient = client)
+        val (sut, client) = makeSut()
 
         //When
         sut.load()
 
         //Then
         assertEquals(1, client.getCount)
+    }
+
+    private fun makeSut(): Pair<LoadCryptoFeedRemoteUseCase, HttpClientSpy> {
+        val client = HttpClientSpy()
+        val sut = LoadCryptoFeedRemoteUseCase(httpClient = client)
+
+        return Pair(sut, client)
+    }
+
+    private class HttpClientSpy: HttpClient {
+        var getCount = 0
+
+        override fun get() {
+            getCount += 1
+        }
     }
 }
