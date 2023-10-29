@@ -62,8 +62,9 @@ dependencies {
     implementation(libs.material3)
 
     testImplementation(libs.mockk.android)
-    testImplementation(libs.mockk.android.agent)
+    testImplementation(libs.mockk.agent)
     testImplementation(libs.turbine)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
