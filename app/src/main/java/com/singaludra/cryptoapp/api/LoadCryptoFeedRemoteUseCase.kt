@@ -3,21 +3,32 @@ package com.singaludra.cryptoapp.api
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-
+//region infrastructure
 interface HttpClient {
     fun get() : Flow<Exception>
 }
 
 class ConnectivityException: Exception()
+class InvalidDataException: Exception()
+//endregion
 
 class LoadCryptoFeedRemoteUseCase constructor(
     private val httpClient: HttpClient
 ) {
     fun load(): Flow<Exception> = flow {
         httpClient.get().collect{ error ->
-            emit(Connectivity())
+            when(error) {
+                is ConnectivityException -> {
+                    emit(Connectivity())
+                }
+                is InvalidDataException -> {
+                    emit(InvalidData())
+                }
+            }
         }
     }
 }
 
 class Connectivity: Exception()
+//HTTP 422, etc
+class InvalidData: Exception()

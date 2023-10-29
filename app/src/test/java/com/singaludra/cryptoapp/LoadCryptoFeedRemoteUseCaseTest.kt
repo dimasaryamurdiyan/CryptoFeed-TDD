@@ -4,6 +4,8 @@ import app.cash.turbine.test
 import com.singaludra.cryptoapp.api.Connectivity
 import com.singaludra.cryptoapp.api.ConnectivityException
 import com.singaludra.cryptoapp.api.HttpClient
+import com.singaludra.cryptoapp.api.InvalidData
+import com.singaludra.cryptoapp.api.InvalidDataException
 import com.singaludra.cryptoapp.api.LoadCryptoFeedRemoteUseCase
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
@@ -116,6 +118,27 @@ class LoadCryptoFeedRemoteUseCaseTest {
         sut.load().test{
             //this will check expected is Connectivity and actual was ConnectivityException
             assertEquals(Connectivity::class.java, awaitItem()::class.java)
+            awaitComplete()
+        }
+
+        //Then
+        verify(exactly = 1) {
+            httpClient.get()
+        }
+
+        confirmVerified(httpClient)
+    }
+
+    @Test
+    fun testLoadDeliversInvalidDataError() = runBlocking {
+        //Given
+        every {
+            httpClient.get()
+        } returns flowOf(InvalidDataException())
+
+        //When
+        sut.load().test {
+            assertEquals(InvalidData::class.java, awaitItem()::class.java)
             awaitComplete()
         }
 
