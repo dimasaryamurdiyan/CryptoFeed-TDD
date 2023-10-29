@@ -114,6 +114,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
         //When
         sut.load().test{
+            //this will check expected is Connectivity and actual was ConnectivityException
             assertEquals(Connectivity::class.java, awaitItem()::class.java)
             awaitComplete()
         }
