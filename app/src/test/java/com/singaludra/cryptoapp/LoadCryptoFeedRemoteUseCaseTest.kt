@@ -82,4 +82,47 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
         confirmVerified(httpClient)
     }
+
+
+    @Test
+    fun testLoadRequestDataResultError() = runBlocking {
+        //Given
+        every {
+            httpClient.get()
+        } throws (Connectivity())
+
+        //When
+        sut.load().test {
+            awaitError()
+        }
+
+        //Then
+        verify(exactly = 1) {
+            httpClient.get()
+        }
+
+        //verify client has been called
+        confirmVerified(httpClient)
+    }
+
+    @Test
+    fun testLoadDeliversErrorOnClientError() = runBlocking {
+        //Given
+        every {
+            httpClient.get()
+        } returns flowOf(ConnectivityException())
+
+        //When
+        sut.load().test{
+            assertEquals(Connectivity::class.java, awaitItem()::class.java)
+            awaitComplete()
+        }
+
+        //Then
+        verify(exactly = 1) {
+            httpClient.get()
+        }
+
+        confirmVerified(httpClient)
+    }
 }
