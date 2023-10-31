@@ -16,6 +16,9 @@ coroutines = "1.7.3"
 mockkVersion = "1.13.8"
 turbineVersion = "1.0.0"
 
+#Http Client
+retrofitVersion = "2.9.0"
+
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -40,6 +43,9 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkVersion" }
 mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkVersion" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbineVersion" }
+
+# Http Client
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }
