@@ -6,6 +6,8 @@ import com.singaludra.cryptoapp.api.BadRequestException
 import com.singaludra.cryptoapp.api.Connectivity
 import com.singaludra.cryptoapp.api.ConnectivityException
 import com.singaludra.cryptoapp.api.HttpClient
+import com.singaludra.cryptoapp.api.InternalServerError
+import com.singaludra.cryptoapp.api.InternalServerErrorException
 import com.singaludra.cryptoapp.api.InvalidData
 import com.singaludra.cryptoapp.api.InvalidDataException
 import com.singaludra.cryptoapp.api.LoadCryptoFeedRemoteUseCase
@@ -160,6 +162,18 @@ class LoadCryptoFeedRemoteUseCaseTest {
             sut = sut,
             receivedHttpClientResult = BadRequestException(),
             expectedResult = BadRequest(),
+            exactly = 1,
+            confirmVerified = httpClient
+        )
+    }
+
+    @Test
+    fun testLoadDeliversInternalServerError() = runBlocking {
+        expect(
+            httpClient = httpClient,
+            sut = sut,
+            receivedHttpClientResult = InternalServerErrorException(),
+            expectedResult = InternalServerError(),
             exactly = 1,
             confirmVerified = httpClient
         )
