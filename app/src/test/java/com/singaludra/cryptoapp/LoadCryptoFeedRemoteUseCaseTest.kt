@@ -158,7 +158,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         expect(
             httpClient = httpClient,
             sut = sut,
-            toCompleteWith = BadRequestException(),
+            receivedHttpClientResult = BadRequestException(),
             expectedResult = BadRequest(),
             exactly = 1,
             confirmVerified = httpClient
@@ -168,7 +168,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
     private fun expect(
         httpClient: HttpClient,
         sut: LoadCryptoFeedRemoteUseCase,
-        toCompleteWith: Exception,
+        receivedHttpClientResult: Exception,
         expectedResult: Any,
         exactly: Int = -1,
         confirmVerified: HttpClient
@@ -176,7 +176,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         //Given
         every {
             httpClient.get()
-        } returns flowOf(toCompleteWith)
+        } returns flowOf(receivedHttpClientResult)
 
         //When
         sut.load().test {
