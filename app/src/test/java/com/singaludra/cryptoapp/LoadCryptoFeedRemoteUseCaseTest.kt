@@ -19,6 +19,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.lang.Exception
 
 
 class LoadCryptoFeedRemoteUseCaseTest {
@@ -154,22 +155,40 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
     @Test
     fun testLoadDeliversBadRequestError() = runBlocking {
+        expect(
+            httpClient = httpClient,
+            sut = sut,
+            toCompleteWith = BadRequestException(),
+            expectedResult = BadRequest(),
+            exactly = 1,
+            confirmVerified = httpClient
+        )
+    }
+
+    private fun expect(
+        httpClient: HttpClient,
+        sut: LoadCryptoFeedRemoteUseCase,
+        toCompleteWith: Exception,
+        expectedResult: Any,
+        exactly: Int = -1,
+        confirmVerified: HttpClient
+    ) = runBlocking{
         //Given
         every {
             httpClient.get()
-        } returns flowOf(BadRequestException())
+        } returns flowOf(toCompleteWith)
 
         //When
         sut.load().test {
-            assertEquals(BadRequest::class.java, awaitItem()::class.java)
+            assertEquals(expectedResult::class.java, awaitItem()::class.java)
             awaitComplete()
         }
 
         //Then
-        verify(exactly = 1) {
+        verify(exactly = exactly) {
             httpClient.get()
         }
 
-        confirmVerified(httpClient)
+        confirmVerified(confirmVerified)
     }
 }
