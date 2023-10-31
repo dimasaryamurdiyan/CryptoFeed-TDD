@@ -10,6 +10,7 @@ interface HttpClient {
 
 class ConnectivityException: Exception()
 class InvalidDataException: Exception()
+class BadRequestException: Exception()
 //endregion
 
 class LoadCryptoFeedRemoteUseCase constructor(
@@ -24,6 +25,9 @@ class LoadCryptoFeedRemoteUseCase constructor(
                 is InvalidDataException -> {
                     emit(InvalidData())
                 }
+                is BadRequestException -> {
+                    emit(BadRequest())
+                }
             }
         }
     }
@@ -32,3 +36,4 @@ class LoadCryptoFeedRemoteUseCase constructor(
 class Connectivity: Exception()
 //HTTP 422, etc
 class InvalidData: Exception()
+class BadRequest: Exception()

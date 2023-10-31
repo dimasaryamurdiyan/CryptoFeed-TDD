@@ -1,6 +1,8 @@
 package com.singaludra.cryptoapp
 
 import app.cash.turbine.test
+import com.singaludra.cryptoapp.api.BadRequest
+import com.singaludra.cryptoapp.api.BadRequestException
 import com.singaludra.cryptoapp.api.Connectivity
 import com.singaludra.cryptoapp.api.ConnectivityException
 import com.singaludra.cryptoapp.api.HttpClient
@@ -139,6 +141,27 @@ class LoadCryptoFeedRemoteUseCaseTest {
         //When
         sut.load().test {
             assertEquals(InvalidData::class.java, awaitItem()::class.java)
+            awaitComplete()
+        }
+
+        //Then
+        verify(exactly = 1) {
+            httpClient.get()
+        }
+
+        confirmVerified(httpClient)
+    }
+
+    @Test
+    fun testLoadDeliversBadRequestError() = runBlocking {
+        //Given
+        every {
+            httpClient.get()
+        } returns flowOf(BadRequestException())
+
+        //When
+        sut.load().test {
+            assertEquals(BadRequest::class.java, awaitItem()::class.java)
             awaitComplete()
         }
 
