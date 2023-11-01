@@ -6,11 +6,13 @@ import com.singaludra.cryptoapp.api.BadRequestException
 import com.singaludra.cryptoapp.api.Connectivity
 import com.singaludra.cryptoapp.api.ConnectivityException
 import com.singaludra.cryptoapp.api.HttpClient
+import com.singaludra.cryptoapp.api.HttpClientResult
 import com.singaludra.cryptoapp.api.InternalServerError
 import com.singaludra.cryptoapp.api.InternalServerErrorException
 import com.singaludra.cryptoapp.api.InvalidData
 import com.singaludra.cryptoapp.api.InvalidDataException
 import com.singaludra.cryptoapp.api.LoadCryptoFeedRemoteUseCase
+import com.singaludra.cryptoapp.api.LoadCryptoFeedResult
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -21,7 +23,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.lang.Exception
 
 
 class LoadCryptoFeedRemoteUseCaseTest {
@@ -51,7 +52,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         //Given
         every {
             httpClient.get()
-        } returns flowOf(Connectivity())
+        } returns flowOf(HttpClientResult.Failure(Connectivity()))
 
         //When
         sut.load().test {
@@ -114,45 +115,26 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
     @Test
     fun testLoadDeliversErrorOnClientError() = runBlocking {
-        //Given
-        every {
-            httpClient.get()
-        } returns flowOf(ConnectivityException())
-
-        //When
-        sut.load().test{
-            //this will check expected is Connectivity and actual was ConnectivityException
-            assertEquals(Connectivity::class.java, awaitItem()::class.java)
-            awaitComplete()
-        }
-
-        //Then
-        verify(exactly = 1) {
-            httpClient.get()
-        }
-
-        confirmVerified(httpClient)
+        expect(
+            httpClient = httpClient,
+            sut = sut,
+            receivedHttpClientResult = HttpClientResult.Failure(ConnectivityException()),
+            expectedResult = Connectivity(),
+            exactly = 1,
+            confirmVerified = httpClient
+        )
     }
 
     @Test
     fun testLoadDeliversInvalidDataError() = runBlocking {
-        //Given
-        every {
-            httpClient.get()
-        } returns flowOf(InvalidDataException())
-
-        //When
-        sut.load().test {
-            assertEquals(InvalidData::class.java, awaitItem()::class.java)
-            awaitComplete()
-        }
-
-        //Then
-        verify(exactly = 1) {
-            httpClient.get()
-        }
-
-        confirmVerified(httpClient)
+        expect(
+            httpClient = httpClient,
+            sut = sut,
+            receivedHttpClientResult = HttpClientResult.Failure(InvalidDataException()),
+            expectedResult = InvalidData(),
+            exactly = 1,
+            confirmVerified = httpClient
+        )
     }
 
     @Test
@@ -160,7 +142,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         expect(
             httpClient = httpClient,
             sut = sut,
-            receivedHttpClientResult = BadRequestException(),
+            receivedHttpClientResult = HttpClientResult.Failure(BadRequestException()),
             expectedResult = BadRequest(),
             exactly = 1,
             confirmVerified = httpClient
@@ -172,7 +154,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
         expect(
             httpClient = httpClient,
             sut = sut,
-            receivedHttpClientResult = InternalServerErrorException(),
+            receivedHttpClientResult = HttpClientResult.Failure(InternalServerErrorException()),
             expectedResult = InternalServerError(),
             exactly = 1,
             confirmVerified = httpClient
@@ -182,7 +164,7 @@ class LoadCryptoFeedRemoteUseCaseTest {
     private fun expect(
         httpClient: HttpClient,
         sut: LoadCryptoFeedRemoteUseCase,
-        receivedHttpClientResult: Exception,
+        receivedHttpClientResult: HttpClientResult,
         expectedResult: Any,
         exactly: Int = -1,
         confirmVerified: HttpClient
@@ -194,7 +176,14 @@ class LoadCryptoFeedRemoteUseCaseTest {
 
         //When
         sut.load().test {
-            assertEquals(expectedResult::class.java, awaitItem()::class.java)
+            when(val receivedResult = awaitItem()) {
+                is LoadCryptoFeedResult.Failure -> {
+                    assertEquals(
+                        expectedResult::class.java,
+                        receivedResult.exception::class.java
+                    )
+                }
+            }
             awaitComplete()
         }
 
